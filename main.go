@@ -8,8 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -21,8 +19,6 @@ func main() {
 	orderService := supports.NewOrderService(orderProcessor)
 
 	go tradeService.Show()
-
-	go orderProcessor.GetMatches()
 
 	// Start the CLI loop
 	reader := bufio.NewReader(os.Stdin)
@@ -51,10 +47,10 @@ func main() {
 			price, _ := strconv.Atoi(texts[3])
 			quantity, _ := strconv.Atoi(texts[4])
 			orderService.AddOrder("1", orderType, texts[2], quantity, float64(price))
+		case "execute":
+			orderProcessor.GetMatches()
 		default:
 			fmt.Println("Unknown command:", text)
 		}
-		spew.Printf("buyHeap: %+v\n", orderProcessor.Buy)
-		spew.Printf("sellHeap: %v\n", orderProcessor.Sell)
 	}
 }

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 type key struct {
@@ -71,9 +73,8 @@ func (op *OrderProcessor) GetMatches() {
 	op.mutex.Lock()
 	for key, buyHeap := range op.Buy {
 		if sellHeap, ok := op.Sell[key]; ok {
-			buyOrder := (*buyHeap)[len(*buyHeap)-1]
-			sellOrder := (*sellHeap)[len(*sellHeap)-1]
-
+			buyOrder := (*buyHeap)[0]
+			sellOrder := (*sellHeap)[0]
 			trade, err := op.tradeService.CreateTrade(buyOrder, sellOrder)
 			if err != nil {
 				fmt.Printf("unable to trade buy: %v, sell: %v\n", buyOrder, sellOrder)
@@ -83,7 +84,7 @@ func (op *OrderProcessor) GetMatches() {
 			sellHeap.Pop()
 			buyOrder.Execute()
 			sellOrder.Execute()
-			fmt.Printf("trade done: %v\n", trade)
+			spew.Printf("trade done: %v\n", trade)
 		}
 	}
 	op.mutex.Unlock()
